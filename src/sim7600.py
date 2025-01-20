@@ -49,6 +49,9 @@ class CELLULAR:
 
     def answer_call(self):
         return self.send_command("ATA")
+    
+    def phone_status(self):
+        return self.send_command("AT+CPAS")[0].split(" ")[1]
 
     # SMS FUNCTIONS
     def send_sms(self, number, message):
