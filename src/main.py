@@ -3,7 +3,7 @@
 # By Johnny Stene
 
 from ec25 import EC25
-from epaper import EPDCONFIG, EPD
+from epaper import DISPLAY
 
 testimg = [
     0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 
@@ -274,10 +274,8 @@ testimg = [
 
 import time
 
-print("display config create")
-display_config = EPDCONFIG()
 print("display create")
-display = EPD(display_config)
+display = DISPLAY()
 print("display init")
 display.init()
 print("display clear")

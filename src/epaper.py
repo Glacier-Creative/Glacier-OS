@@ -24,93 +24,26 @@
 import machine
 import time
 
-# Display resolution
-EPD_WIDTH       = 176
-EPD_HEIGHT      = 264
-
-GRAY1  = 0xff #white
-GRAY2  = 0xC0
-GRAY3  = 0x80 #gray
-GRAY4  = 0x00 #Blackest
-
-class EPDCONFIG:
-    # Pin definition
-    RST_PIN  = 8
-    DC_PIN   = 7
-    CS_PIN   = 6
-    BUSY_PIN = 9
-    #PWR_PIN  = 18
-    MOSI_PIN = 3
-    SCLK_PIN = 2
-    MISO_PIN = 4
-
-    def __init__(self):
-        self.GPIO_RST_PIN    = machine.Pin(self.RST_PIN, machine.Pin.OUT)
-        self.GPIO_DC_PIN     = machine.Pin(self.DC_PIN, machine.Pin.OUT)
-        self.GPIO_CS_PIN     = machine.Pin(self.CS_PIN, machine.Pin.OUT)
-        #self.GPIO_PWR_PIN    = machine.Pin(self.PWR_PIN)
-        self.GPIO_BUSY_PIN   = machine.Pin(self.BUSY_PIN, machine.Pin.IN)
-        self.GPIO_SCLK_PIN = machine.Pin(self.SCLK_PIN, machine.Pin.OUT)
-        self.GPIO_MOSI_PIN = machine.Pin(self.MOSI_PIN, machine.Pin.OUT)
-        self.GPIO_MISO_PIN = machine.Pin(self.MISO_PIN, machine.Pin.IN)
+class DISPLAY:
+    def __init__(self, sck_pin=2, mosi_pin=3, miso_pin=4, cs_pin=6, dc_pin=7, rst_pin=8, busy_pin=9):
+        self.GPIO_RST_PIN    = machine.Pin(rst_pin, machine.Pin.OUT)
+        self.GPIO_DC_PIN     = machine.Pin(dc_pin, machine.Pin.OUT)
+        self.GPIO_CS_PIN     = machine.Pin(cs_pin, machine.Pin.OUT)
+        self.GPIO_BUSY_PIN   = machine.Pin(busy_pin, machine.Pin.IN)
+        self.GPIO_SCLK_PIN = machine.Pin(sck_pin, machine.Pin.OUT)
+        self.GPIO_MOSI_PIN = machine.Pin(mosi_pin, machine.Pin.OUT)
+        self.GPIO_MISO_PIN = machine.Pin(miso_pin, machine.Pin.IN)
         self.SPI = machine.SPI(0, baudrate=1000000, sck=self.GPIO_SCLK_PIN, mosi=self.GPIO_MOSI_PIN, miso=self.GPIO_MISO_PIN)
-
-    def digital_write(self, pin, value):
-        if pin == self.RST_PIN:
-            if value:
-                self.GPIO_RST_PIN.on()
-            else:
-                self.GPIO_RST_PIN.off()
-        elif pin == self.DC_PIN:
-            if value:
-                self.GPIO_DC_PIN.on()
-            else:
-                self.GPIO_DC_PIN.off()
-        elif pin == self.CS_PIN:
-            if value:
-                self.GPIO_CS_PIN.on()
-            else:
-                self.GPIO_CS_PIN.off()
-
-    def digital_read(self, pin):
-        if pin == self.BUSY_PIN:
-            return self.GPIO_BUSY_PIN.value()
-        elif pin == self.RST_PIN:
-            return self.GPIO_RST_PIN.value()
-        elif pin == self.DC_PIN:
-            return self.GPIO_DC_PIN.value()
-        elif pin == self.CS_PIN:
-            return self.GPIO_CS_PIN.value()
-
-    def delay_ms(self, delaytime):
-        time.sleep(delaytime / 1000.0)
-
-    def spi_writebyte(self, data):
-        sdata = None
-        if(isinstance(data, int)):
-            sdata = bytes([data])
-        else:
-            sdata = bytes(data)
-        self.SPI.write(sdata)
-    def module_exit(self):
-        self.SPI.close()
-
-        self.GPIO_RST_PIN.off()
-        self.GPIO_DC_PIN.off()
-
-class EPD:
-    def __init__(self, epdconfig):
-        self.epdconfig = epdconfig
-        self.reset_pin = self.epdconfig.RST_PIN
-        self.dc_pin = self.epdconfig.DC_PIN
-        self.busy_pin = self.epdconfig.BUSY_PIN
-        self.cs_pin = self.epdconfig.CS_PIN
-        self.width = EPD_WIDTH
-        self.height = EPD_HEIGHT
-        self.GRAY1  = GRAY1 #white
-        self.GRAY2  = GRAY2
-        self.GRAY3  = GRAY3 #gray
-        self.GRAY4  = GRAY4 #Blackest
+        self.reset_pin = rst_pin
+        self.dc_pin = dc_pin
+        self.busy_pin = busy_pin
+        self.cs_pin = cs_pin
+        self.width = 176
+        self.height = 264
+        self.GRAY1  = 0xFF #white
+        self.GRAY2  = 0xC0
+        self.GRAY3  = 0x80 #gray
+        self.GRAY4  = 0x00 #Blackest
 
     lut_vcom_dc = [0x00, 0x00,
         0x00, 0x08, 0x00, 0x00, 0x00, 0x02,
@@ -210,30 +143,74 @@ class EPD:
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
     ]
     
+    def digital_write(self, pin, value):
+        if pin == self.reset_pin:
+            if value:
+                self.GPIO_RST_PIN.on()
+            else:
+                self.GPIO_RST_PIN.off()
+        elif pin == self.dc_pin:
+            if value:
+                self.GPIO_DC_PIN.on()
+            else:
+                self.GPIO_DC_PIN.off()
+        elif pin == self.cs_pin:
+            if value:
+                self.GPIO_CS_PIN.on()
+            else:
+                self.GPIO_CS_PIN.off()
+
+    def digital_read(self, pin):
+        if pin == self.busy_pin:
+            return self.GPIO_BUSY_PIN.value()
+        elif pin == self.reset_pin:
+            return self.GPIO_RST_PIN.value()
+        elif pin == self.dc_pin:
+            return self.GPIO_DC_PIN.value()
+        elif pin == self.cs_pin:
+            return self.GPIO_CS_PIN.value()
+
+    def delay_ms(self, delaytime):
+        time.sleep(delaytime / 1000.0)
+
+    def spi_writebyte(self, data):
+        sdata = None
+        if(isinstance(data, int)):
+            sdata = bytes([data])
+        else:
+            sdata = bytes(data)
+        self.SPI.write(sdata)
+        
+    def module_exit(self):
+        self.SPI.close()
+
+        self.GPIO_RST_PIN.off()
+        self.GPIO_DC_PIN.off()
+
     # Hardware reset
     def reset(self):
-        self.epdconfig.digital_write(self.reset_pin, 1)
-        self.epdconfig.delay_ms(200) 
-        self.epdconfig.digital_write(self.reset_pin, 0)
-        self.epdconfig.delay_ms(5)
-        self.epdconfig.digital_write(self.reset_pin, 1)
-        self.epdconfig.delay_ms(200)   
+        self.digital_write(self.reset_pin, 1)
+        self.delay_ms(200) 
+        self.digital_write(self.reset_pin, 0)
+        self.delay_ms(5)
+        self.digital_write(self.reset_pin, 1)
+        self.delay_ms(200)   
 
     def send_command(self, command):
-        self.epdconfig.digital_write(self.dc_pin, 0)
-        self.epdconfig.digital_write(self.cs_pin, 0)
-        self.epdconfig.spi_writebyte(command)
-        self.epdconfig.digital_write(self.cs_pin, 1)
+        self.digital_write(self.dc_pin, 0)
+        self.digital_write(self.cs_pin, 0)
+        self.spi_writebyte(command)
+        self.digital_write(self.cs_pin, 1)
 
     def send_data(self, data):
-        self.epdconfig.digital_write(self.dc_pin, 1)
-        self.epdconfig.digital_write(self.cs_pin, 0)
-        self.epdconfig.spi_writebyte(data)
-        self.epdconfig.digital_write(self.cs_pin, 1)
+        self.digital_write(self.dc_pin, 1)
+        self.digital_write(self.cs_pin, 0)
+        self.spi_writebyte(data)
+        self.digital_write(self.cs_pin, 1)
         
     def ReadBusy(self):        
-        while(self.epdconfig.digital_read(self.busy_pin) == 0):      #  0: idle, 1: busy
-            self.epdconfig.delay_ms(200)
+        while(self.digital_read(self.busy_pin) == 0):      #  0: idle, 1: busy
+            self.delay_ms(200)
 
     def set_lut(self):
         self.send_command(0x20) # vcom
@@ -544,7 +521,7 @@ class EPD:
         
         self.gray_SetLut()
         self.send_command(0x12)
-        self.epdconfig.delay_ms(200)
+        self.delay_ms(200)
         self.ReadBusy()
         # pass
         
@@ -565,7 +542,7 @@ class EPD:
         self.send_command(0X07)
         self.send_data(0xA5)
         
-        self.epdconfig.delay_ms(2000)
-        self.epdconfig.module_exit()
+        self.delay_ms(2000)
+        self.module_exit()
 ### END OF FILE ###
 
