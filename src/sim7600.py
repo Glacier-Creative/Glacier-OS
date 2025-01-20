@@ -27,6 +27,7 @@ class CELLULAR:
         self.imei = self.send_command("AT+CGSN")[0]
         self.send_command("AT+CMGF=1")
 
+    # NETWORK FUNCTIONS
     def provider_name(self):
         response = self.send_command("AT+CSPN?")[0]
         if(response == "ERROR"):
@@ -35,13 +36,21 @@ class CELLULAR:
 
     def imsi(self):
         return self.send_command("AT+CIMI")[0]
+
+    def phone_number(self):
+        return self.send_command("AT+CNUM")[0].split("\"")[3]
     
+    # CALL FUNCTIONS
     def call(self, number):
         return self.send_command("ATD" + number + ";")
     
     def end_call(self):
         return self.send_command("AT+CHUP")
-    
+
+    def answer_call(self):
+        return self.send_command("ATA")
+
+    # SMS FUNCTIONS
     def send_sms(self, number, message):
         response = self.send_command("AT+CMGS=\"" + number + "\"\r")
         response = self.send_command(message + "\x1A", response_timeout=10)
