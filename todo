@@ -1,0 +1,2 @@
+- renderer: fix banding issues when image draw start not multiple of 8 (weird byte revesing thing??)
+- ec25: whole driver

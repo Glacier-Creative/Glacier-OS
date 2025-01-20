@@ -135,7 +135,6 @@ class GRAPHICS:
     def __init__(self):
         self.display = DISPLAY()
         self.display.init()
-        self.display.Clear()
 
         self.framebuffer = [0xFF for i in range(int(self.display.width * self.display.height / 8))]
 
