@@ -20,22 +20,21 @@ class GRAPHICS:
         byte_x = x // 8
 
         if(value):
-            self.framebuffer[byte_x + int(y * self.display.width / 8)] &= value | (1<<bit_x)
+            self.framebuffer[byte_x + int(y * self.display.width / 8)] |= (1<<bit_x)
         else:
-            self.framebuffer[byte_x + int(y * self.display.width / 8)] &= value & ~(1<<bit_x)
+            self.framebuffer[byte_x + int(y * self.display.width / 8)] &= ~(1<<bit_x)
 
     def draw_image(self, x, y, filename):
         with open(filename) as file: # Parse XBM file
             contents = file.read()
             width = int(contents.split("\n")[0].split(" ")[2])
             height = int(contents.split("\n")[1].split(" ")[2])
-            imgcontent = contents.split("{")[1].replace("};", "").replace(" ", "").replace("\n", "").replace("0x", "").replace(",", "")
-            data = bytearray.fromhex(imgcontent)
+            data = bytearray.fromhex(contents.split("{")[1].replace("};", "").replace(" ", "").replace("\n", "").replace("0x", "").replace(",", ""))
             
             for iy in range(height):
                 for ix in range(width):
                     bit_x = ix % 8
                     byte_x = ix // 8
-                    byte_value = data[byte_x + int(iy * width / 8)]
+                    byte_value = ~data[byte_x + int(iy * width / 8)]
                     bit_value = (byte_value >> (7 - bit_x)) & 1
                     self.set_pixel(x + ix, y + iy, bit_value)
