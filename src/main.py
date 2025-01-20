@@ -8,12 +8,13 @@ import time
 
 print("display amongus")
 graphics = GRAPHICS()
-for i in range(0, 64):
-    graphics.set_pixel(i, 64, 0x00)
 
+graphics.draw_image(0, 0, "img/homescreen.xbm")
 graphics.draw_image(0, 0, "img/amogus.xbm")
-graphics.draw_image(21, 150, "img/amogus.xbm")
-graphics.draw_character8x8(83, 40, "A")
+graphics.draw_image(32, 0, "img/bat_empty.xbm")
+
+graphics.draw_image(0, 216, "img/app_empty.xbm")
+
 graphics.draw_string8x8(0, 0, "amogus")
 
 graphics.refresh()
