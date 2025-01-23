@@ -5,6 +5,14 @@
 import machine
 import time
 
+class SMS_MESSAGE:
+    def __init__(self, status, number, date, time, message):
+        self.status = status
+        self.number = number
+        self.date = date
+        self.time = time
+        self.message = message
+
 class CELLULAR:
     def __init__(self, pin_rx=17, pin_tx=16):
         self.uart = machine.UART(0)
@@ -17,7 +25,10 @@ class CELLULAR:
         #print("cell >> " + command)
         self.uart.write(command + "\r")
         time.sleep(response_timeout)
-        response = self.uart.read().decode("ascii").split("\r\n")[1:-1]
+        try:
+            response = self.uart.read().decode("ascii").split("\r\n")[1:-1]
+        except:
+            print("No response from modem!!!!")
         #print("cell << " + str(response))
         return response
     
@@ -51,6 +62,9 @@ class CELLULAR:
         return self.send_command("ATA")
     
     def phone_status(self):
+        # 0: ready
+        # 3: ringing
+        # 4: in call
         return self.send_command("AT+CPAS")[0].split(" ")[1]
 
     # SMS FUNCTIONS
@@ -58,3 +72,14 @@ class CELLULAR:
         response = self.send_command("AT+CMGS=\"" + number + "\"\r")
         response = self.send_command(message + "\x1A", response_timeout=10)
         return response
+
+    def read_all_sms(self):
+        response = self.send_command("AT+CMGL=\"ALL\"", response_timeout=1)
+        messages = []
+        for i in range(int(len(response) / 2)):
+            mi = i * 2
+            metadata = response[mi].replace("\"", "").split(",")
+            if(len(metadata) == 6):
+                message = SMS_MESSAGE(metadata[1], metadata[2], metadata[4], metadata[5], response[mi + 1])
+                messages.append(message)
+        return messages
