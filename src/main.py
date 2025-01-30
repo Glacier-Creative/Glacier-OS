@@ -8,7 +8,11 @@ print("Importing drivers")
 from sim7600 import CELLULAR
 from graphics import GRAPHICS
 from keypad import KEYPAD
+from event import EventSystem
 import time
+
+print("Start event system")
+event = EventSystem()
 
 print("Keypad bringup")
 keypad = KEYPAD()
@@ -19,6 +23,11 @@ cell.startup()
 
 print("Graphics bringup")
 graphics = GRAPHICS()
+
+def home_redraw():
+    graphics.draw_image(0, 0, "img/homescreen.xbm")
+    graphics.draw_string8x8(16, 24, "Test!")
+    graphics.refresh()
 
 def handle_call():
     print("incoming call")
@@ -54,32 +63,37 @@ def handle_call():
             return
         time.sleep(0.05)
 
-print("Home screen start")
-home_redraw = True
-home_time_last = ""
-while True:
-    if(home_redraw):
-        graphics.draw_image(0, 0, "img/homescreen.xbm")
-        graphics.draw_string8x8(16, 24, "Test!")
+def handle_sms(**kwargs):
+    print("incoming sms")
+    if not "data" in kwargs:
+        print("sms handler error: called without data karg!")
+        return
 
-        graphics.refresh()
-        home_redraw = False
-    
+    message = kwargs["data"]
+    graphics.clear()
+    graphics.draw_image(0, 0, "img/sms.xbm")
+    graphics.draw_string8x8(8, 32, message.number)
+    graphics.draw_string8x8(8, 40, message.date)
+    graphics.draw_string8x8(8, 48, message.time)
+    graphics.draw_string8x8(8, 64, message.message)
+    graphics.refresh()
+    time.sleep(10)
+
+event.subscribe("home_redraw", home_redraw)
+event.subscribe("cell_ring", handle_call)
+event.subscribe("cell_sms", handle_sms)
+
+# Main loop
+while True:
     cell_status = cell.phone_status()
-    if("3" in cell_status):
-        handle_call()
-        home_redraw = True
+    if "3" in cell_status:
+        event.publish("cell_ring")
+        event.publish("home_redraw")
 
     messages = cell.read_all_sms()
     for message in messages:
         if(message.status == "REC UNREAD"):
-            print("incoming sms")
-            graphics.clear()
-            graphics.draw_image(0, 0, "img/sms.xbm")
-            graphics.draw_string8x8(8, 32, message.number)
-            graphics.draw_string8x8(8, 40, message.date)
-            graphics.draw_string8x8(8, 48, message.time)
-            graphics.draw_string8x8(8, 64, message.message)
-            graphics.refresh()
-            time.sleep(10)
-            home_redraw = True
+            event.publish("cell_sms", data=message)
+            event.publish("home_redraw")
+    
+    key_pressed = keypad.get_key(wait=False)

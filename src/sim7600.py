@@ -37,6 +37,14 @@ class CELLULAR:
         self.model = self.send_command("AT+CGMM")[0]
         self.imei = self.send_command("AT+CGSN")[0]
         self.send_command("AT+CMGF=1")
+        self.send_command("AT+CTZU=1")
+
+    def get_rtc(self):
+        response = self.send_command("AT+CCLK?")
+        for line in response:
+            if("+CCLK" in line):
+                return line.split("\"")[1]
+        return None
 
     # NETWORK FUNCTIONS
     def provider_name(self):
