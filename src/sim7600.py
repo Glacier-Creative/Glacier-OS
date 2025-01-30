@@ -6,12 +6,13 @@ import machine
 import time
 
 class SMS_MESSAGE:
-    def __init__(self, status, number, date, time, message):
+    def __init__(self, status, number, date, time, message, received=True):
         self.status = status
         self.number = number
         self.date = date
         self.time = time
         self.message = message
+        self.received = received
 
 class CELLULAR:
     def __init__(self, pin_rx=17, pin_tx=16):

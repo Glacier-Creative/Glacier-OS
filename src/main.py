@@ -9,10 +9,15 @@ from sim7600 import CELLULAR
 from graphics import GRAPHICS
 from keypad import KEYPAD
 from event import EventSystem
+from database import Database
 import time
 
 print("Start event system")
 event = EventSystem()
+
+print("Load database")
+db = Database()
+db.load("db.json")
 
 print("Keypad bringup")
 keypad = KEYPAD()
@@ -84,6 +89,7 @@ event.subscribe("cell_ring", handle_call)
 event.subscribe("cell_sms", handle_sms)
 
 # Main loop
+home_redraw()
 while True:
     cell_status = cell.phone_status()
     if "3" in cell_status:
@@ -93,6 +99,7 @@ while True:
     messages = cell.read_all_sms()
     for message in messages:
         if(message.status == "REC UNREAD"):
+            db.add_message_entry(message)
             event.publish("cell_sms", data=message)
             event.publish("home_redraw")
     
