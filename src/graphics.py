@@ -149,7 +149,7 @@ class GRAPHICS:
         bit_x = x % 8
         byte_x = x // 8
 
-        if(value):
+        if value:
             self.framebuffer[byte_x + int(y * self.display.width / 8)] |= (1<<bit_x)
         else:
             self.framebuffer[byte_x + int(y * self.display.width / 8)] &= ~(1<<bit_x)
@@ -165,7 +165,7 @@ class GRAPHICS:
             data = bytearray.fromhex(contents.split("{")[1].replace("};", "").replace(" ", "").replace("\n", "").replace("0x", "").replace(",", ""))
             
             print("image data buffer length: " + str(len(data)))
-            if(len(data) != width * height / 8):
+            if len(data) != width * height / 8:
                 print("image size wrong? (expected " + str(width * height / 8) + ")")
             
             for iy in range(height):

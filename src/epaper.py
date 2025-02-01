@@ -175,7 +175,7 @@ class DISPLAY:
 
     def spi_writebyte(self, data):
         sdata = None
-        if(isinstance(data, int)):
+        if isinstance(data, int):
             sdata = bytes([data])
         else:
             sdata = bytes(data)
@@ -397,13 +397,13 @@ class DISPLAY:
         image_monocolor = image.convert('1')
         imwidth, imheight = image_monocolor.size
         pixels = image_monocolor.load()
-        if(imwidth == self.width and imheight == self.height):
+        if imwidth == self.width and imheight == self.height:
             for y in range(imheight):
                 for x in range(imwidth):
                     # Set the bits for the column of pixels at the current position.
                     if pixels[x, y] == 0:
                         buf[int((x + y * self.width) / 8)] &= ~(0x80 >> (x % 8))
-        elif(imwidth == self.height and imheight == self.width):
+        elif imwidth == self.height and imheight == self.width:
             for y in range(imheight):
                 for x in range(imwidth):
                     newx = y
@@ -418,29 +418,29 @@ class DISPLAY:
         imwidth, imheight = image_monocolor.size
         pixels = image_monocolor.load()
         i=0
-        if(imwidth == self.width and imheight == self.height):
+        if imwidth == self.width and imheight == self.height:
             for y in range(imheight):
                 for x in range(imwidth):
                     # Set the bits for the column of pixels at the current position.
-                    if(pixels[x, y] == 0xC0):
+                    if pixels[x, y] == 0xC0:
                         pixels[x, y] = 0x80
-                    elif (pixels[x, y] == 0x80):
+                    elif pixels[x, y] == 0x80:
                         pixels[x, y] = 0x40
                     i= i+1
-                    if(i%4 == 0):
+                    if i%4 == 0:
                         buf[int((x + (y * self.width))/4)] = ((pixels[x-3, y]&0xc0) | (pixels[x-2, y]&0xc0)>>2 | (pixels[x-1, y]&0xc0)>>4 | (pixels[x, y]&0xc0)>>6)
                         
-        elif(imwidth == self.height and imheight == self.width):
+        elif imwidth == self.height and imheight == self.width:
             for x in range(imwidth):
                 for y in range(imheight):
                     newx = y
                     newy = self.height - x - 1
-                    if(pixels[x, y] == 0xC0):
+                    if pixels[x, y] == 0xC0:
                         pixels[x, y] = 0x80
-                    elif (pixels[x, y] == 0x80):
+                    elif pixels[x, y] == 0x80:
                         pixels[x, y] = 0x40
                     i= i+1
-                    if(i%4 == 0):
+                    if i%4 == 0:
                         buf[int((newx + (newy * self.width))/4)] = ((pixels[x, y-3]&0xc0) | (pixels[x, y-2]&0xc0)>>2 | (pixels[x, y-1]&0xc0)>>4 | (pixels[x, y]&0xc0)>>6) 
         return buf
     
@@ -462,11 +462,11 @@ class DISPLAY:
                 temp1 = image[i*2+j]
                 for k in range(0, 2):
                     temp2 = temp1&0xC0 
-                    if(temp2 == 0xC0):
+                    if temp2 == 0xC0:
                         temp3 |= 0x01#white
-                    elif(temp2 == 0x00):
+                    elif temp2 == 0x00:
                         temp3 |= 0x00  #black
-                    elif(temp2 == 0x80): 
+                    elif temp2 == 0x80: 
                         temp3 |= 0x01  #gray1
                     else: #0x40
                         temp3 |= 0x00 #gray2
@@ -474,15 +474,15 @@ class DISPLAY:
                     
                     temp1 <<= 2
                     temp2 = temp1&0xC0 
-                    if(temp2 == 0xC0):  #white
+                    if temp2 == 0xC0:  #white
                         temp3 |= 0x01
-                    elif(temp2 == 0x00): #black
+                    elif temp2 == 0x00: #black
                         temp3 |= 0x00
-                    elif(temp2 == 0x80):
+                    elif temp2 == 0x80:
                         temp3 |= 0x01 #gray1
                     else :   #0x40
                             temp3 |= 0x00	#gray2	
-                    if(j!=1 or k!=1):				
+                    if j!=1 or k!=1:				
                         temp3 <<= 1
                     temp1 <<= 2
             self.send_data(temp3)
@@ -494,11 +494,11 @@ class DISPLAY:
                 temp1 = image[i*2+j]
                 for k in range(0, 2):
                     temp2 = temp1&0xC0 
-                    if(temp2 == 0xC0):
+                    if temp2 == 0xC0:
                         temp3 |= 0x01#white
-                    elif(temp2 == 0x00):
+                    elif temp2 == 0x00:
                         temp3 |= 0x00  #black
-                    elif(temp2 == 0x80):
+                    elif temp2 == 0x80:
                         temp3 |= 0x00  #gray1
                     else: #0x40
                         temp3 |= 0x01 #gray2
@@ -506,15 +506,15 @@ class DISPLAY:
                     
                     temp1 <<= 2
                     temp2 = temp1&0xC0 
-                    if(temp2 == 0xC0):  #white
+                    if temp2 == 0xC0:  #white
                         temp3 |= 0x01
-                    elif(temp2 == 0x00): #black
+                    elif temp2 == 0x00: #black
                         temp3 |= 0x00
-                    elif(temp2 == 0x80):
+                    elif temp2 == 0x80:
                         temp3 |= 0x00 #gray1
                     else:    #0x40
                             temp3 |= 0x01	#gray2
-                    if(j!=1 or k!=1):					
+                    if j!=1 or k!=1:					
                         temp3 <<= 1
                     temp1 <<= 2
             self.send_data(temp3)

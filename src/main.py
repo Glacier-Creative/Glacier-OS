@@ -77,7 +77,7 @@ def handle_sms(**kwargs):
     message = kwargs["data"]
     graphics.clear()
     graphics.draw_image(0, 0, "img/sms.xbm")
-    graphics.draw_string8x8(8, 32, message.number)
+    graphics.draw_string8x8(8, 32, db.get_name(message.number))
     graphics.draw_string8x8(8, 40, message.date)
     graphics.draw_string8x8(8, 48, message.time)
     graphics.draw_string8x8(8, 64, message.message)
@@ -100,6 +100,7 @@ while True:
     for message in messages:
         if(message.status == "REC UNREAD"):
             db.add_message_entry(message)
+            db.save("db.json") # this will probably never be called more than once per loop so its fine here
             event.publish("cell_sms", data=message)
             event.publish("home_redraw")
     

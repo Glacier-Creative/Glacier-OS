@@ -43,14 +43,14 @@ class CELLULAR:
     def get_rtc(self):
         response = self.send_command("AT+CCLK?")
         for line in response:
-            if("+CCLK" in line):
+            if "+CCLK" in line:
                 return line.split("\"")[1]
         return None
 
     # NETWORK FUNCTIONS
     def provider_name(self):
         response = self.send_command("AT+CSPN?")[0]
-        if(response == "ERROR"):
+        if response == "ERROR":
             return None
         return response[7:-2]
 
@@ -88,7 +88,7 @@ class CELLULAR:
         for i in range(int(len(response) / 2)):
             mi = i * 2
             metadata = response[mi].replace("\"", "").split(",")
-            if(len(metadata) == 6):
+            if len(metadata) == 6:
                 message = SMS_MESSAGE(metadata[1], metadata[2], metadata[4], metadata[5], response[mi + 1])
                 messages.append(message)
         return messages

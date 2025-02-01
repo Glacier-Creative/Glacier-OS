@@ -15,29 +15,17 @@ class KEYPAD:
         
         for pin in range(4):
             self.pins.append(Pin(pins[pin + 4], mode=Pin.IN, pull = Pin.PULL_DOWN))
-
-    def test(self):
-        for col in range(4):
-            self.pins[col].value(1)
-            for row in range(4):
-                if(self.pins[row + 4].value()):
-                    print(str(col) + ":" + str(row) + " - on - " + self.translation[col][row])
-                else:
-                    #print(str(col) + ":" + str(row) + " - off")
-                    pass
-            self.pins[col].value(0)
-            time.sleep(0.05)
     
     def get_key(self, wait=False, debounce=False):
         while True:
             for col in range(4):
                 self.pins[col].value(1)
                 for row in range(4):
-                    if(self.pins[row + 4].value()):
+                    if self.pins[row + 4].value():
                         # todo: debounce
-                        return(self.translation[col][row])
+                        return self.translation[col][row]
                 self.pins[col].value(0)
                 time.sleep(0.05)
 
-            if(wait == False):
+            if wait == False:
                 return None
