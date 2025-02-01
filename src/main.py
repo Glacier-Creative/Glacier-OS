@@ -43,10 +43,10 @@ def handle_call():
     graphics.refresh()
     while True:
         response = keypad.get_key(wait=False)
-        if(response == "A"):
+        if response == "A":
             cell.answer_call()
             break
-        elif(response == "B"):
+        elif response == "B":
             cell.end_call()
             return
         if not("3" in cell.phone_status()):
@@ -61,7 +61,7 @@ def handle_call():
 
     while True:
         response = keypad.get_key(wait=False)
-        if(response == "B"):
+        if response == "B":
             cell.end_call()
             return
         if not("4" in cell.phone_status()):
@@ -98,7 +98,7 @@ while True:
 
     messages = cell.read_all_sms()
     for message in messages:
-        if(message.status == "REC UNREAD"):
+        if message.status == "REC UNREAD":
             db.add_message_entry(message)
             db.save("db.json") # this will probably never be called more than once per loop so its fine here
             event.publish("cell_sms", data=message)
