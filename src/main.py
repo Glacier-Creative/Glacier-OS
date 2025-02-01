@@ -5,8 +5,8 @@ print("Glacier Communicatior")
 print("Firmware version 0.1-a")
 
 print("Importing drivers")
-from sim7600 import CELLULAR
-from graphics import GRAPHICS # TODO: GRAPHICS should be Graphics
+from sim7600 import CELLULAR 
+from graphics import GRAPHICS # TODO: GRAPHICS should be Graphics - the hardware driver is DISPLAY and is loaded by graphics.py directly
 from keypad import KEYPAD
 from event import EventSystem
 from database import Database
