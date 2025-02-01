@@ -1,4 +1,4 @@
-# Glacier Communicator Firmware
+# Glacier Communicator Firmware TODO: come up with a better name i'm tired of this one
 # Main
 # By Johnny Stene
 print("Glacier Communicatior")
