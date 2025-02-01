@@ -9,7 +9,7 @@ class Database:
         self._phonebook = {}
         self._messages = {}
     
-    def load(self, filename):
+    def load(self, filename): # load from a json file. TODO: when uos gets implemented this will need to change
         print("Loading database from " + filename)
         try:
             with open(filename) as file:
@@ -19,7 +19,7 @@ class Database:
         except:
             print("Failed to load")
 
-    def save(self, filename):
+    def save(self, filename): # just dumps to a json file. TODO: when uos gets implemented this will need to change
         print("Saving database to " + filename)
         try:
             with open(filename, "w") as file:
@@ -27,7 +27,7 @@ class Database:
         except:
             print("Failed to save")
 
-    def add_phonebook_entry(self, number, name, email=None):
+    def add_phonebook_entry(self, number, name, email=None): # does what it says on the tin
         if number in self._phonebook:
             return False
 
@@ -38,13 +38,13 @@ class Database:
 
         return True
 
-    def get_name(self, number):
+    def get_name(self, number): # return name for a given number, or, return the number if not in contacts yet
         if not number in self._phonebook:
             return number
         
         return self._phonebook[number]["name"]
     
-    def get_email(self, number):
+    def get_email(self, number): # TODO: do we need this? might not even include an email client
         if not number in self._phonebook:
             return None
         
@@ -53,14 +53,14 @@ class Database:
         
         return self._phonebook[number]["email"]
     
-    def add_message_entry(self, message):
+    def add_message_entry(self, message): # take in an sms message object and add it to db
         if not message.number in self._messages:
             self._messages[message.number] = []
         
         time = 0 # TODO: calculate seconds since epoch based on message.date and message.time
         self._messages[message.number].append({"time":time, "message": message.message})
     
-    def get_message_thread(self, number):
+    def get_message_thread(self, number): # return all messages with a certain number sorted by time
         if not number in self._messages:
             return []
         

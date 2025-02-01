@@ -1,7 +1,7 @@
 from epaper import DISPLAY
 
 class GRAPHICS:
-    font8x8_basic = [
+    font8x8_basic = [ # this font sucks. TODO: make a tool to make better fonts (or get TTF library?)
         [ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00],   # U+0000 (nul)
         [ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00],   # U+0001
         [ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00],   # U+0002
@@ -138,14 +138,15 @@ class GRAPHICS:
 
         self.framebuffer = [0xFF for i in range(int(self.display.width * self.display.height / 8))]
 
-    def refresh(self):
+    def refresh(self): # send framebuffer to display
         self.display.display(self.framebuffer)
     
-    def clear(self, color=0xFF):
+    def clear(self, color=0xFF): # clear display
         for i in range(int(self.display.width * self.display.height / 8)):
             self.framebuffer[i] = color
     
-    def set_pixel(self, x, y, value):
+    def set_pixel(self, x, y, value): # set a pixel on display
+        # seeing bitwise anything in python makes me sad
         bit_x = x % 8
         byte_x = x // 8
 
@@ -154,29 +155,41 @@ class GRAPHICS:
         else:
             self.framebuffer[byte_x + int(y * self.display.width / 8)] &= ~(1<<bit_x)
 
-    def draw_image(self, x, y, filename):
-        with open(filename) as file: # Parse XBM file
-            print("loading image file " + filename)
-            contents = file.read()
-            width = int(contents.split("\n")[0].split(" ")[2])
-            height = int(contents.split("\n")[1].split(" ")[2])
-            
-            print("size: " + str(width) + "x" + str(height))
-            data = bytearray.fromhex(contents.split("{")[1].replace("};", "").replace(" ", "").replace("\n", "").replace("0x", "").replace(",", ""))
-            
-            print("image data buffer length: " + str(len(data)))
-            if len(data) != width * height / 8:
-                print("image size wrong? (expected " + str(width * height / 8) + ")")
-            
-            for iy in range(height):
-                for ix in range(width):
-                    bit_x = ix % 8
-                    byte_x = ix // 8
-                    byte_value = ~data[byte_x + int(iy * width / 8)]
-                    bit_value = (byte_value >> (7 - bit_x)) & 1
-                    self.set_pixel(x + ix, y + iy, bit_value)
+    def draw_image(self, x, y, filename): # draw an xbm image. hotspots will probably crash this though
+        try:
+            with open(filename) as file: # Parse XBM file
+                print("loading image file " + filename)
+                contents = file.read()
+
+                # GIMP at least always exports like this but it isn't 100%... maybe parse the #defines
+                width = int(contents.split("\n")[0].split(" ")[2])
+                height = int(contents.split("\n")[1].split(" ")[2])
+                
+                # this will crash the function if what happens above causes problems
+                print("size: " + str(width) + "x" + str(height))
+
+                # do evil string manipulation to get the raw bytes... i hate this
+                data = bytearray.fromhex(contents.split("{")[1].replace("};", "").replace(" ", "").replace("\n", "").replace("0x", "").replace(",", ""))
+                
+                # if all somehow went well we should have an image. sanity check the size real quick
+                print("image data buffer length: " + str(len(data)))
+                if len(data) != width * height / 8:
+                    print("image size wrong? (expected " + str(width * height / 8) + ")")
+                
+                # the bitwise math here is just because xbm image is 1-bit pixels in 8-bit bytes. the angry bitwise magic for writing is in set_pixel
+                for iy in range(height):
+                    for ix in range(width):
+                        bit_x = ix % 8
+                        byte_x = ix // 8
+                        byte_value = ~data[byte_x + int(iy * width / 8)]
+                        bit_value = (byte_value >> (7 - bit_x)) & 1
+                        self.set_pixel(x + ix, y + iy, bit_value)
+        except:
+            print("Something went wrong drawing " + filename)
 
     def draw_character8x8(self, x, y, char):
+        # this works, but i think it breaks if you draw on a non-byte-aligned x value? or maybe im just looking wrong
+        # either way TODO: look further into this
         for iy in range(8):
             for ix in range(8):
                 bit_x = ix % 8
@@ -185,6 +198,7 @@ class GRAPHICS:
                 self.set_pixel(x + ix, y + iy, bit_value)
     
     def draw_string8x8(self, x, y, string):
+        # draw several characters in a row. TODO: add newline, tab, etc...
         dx = x
         for char in string:
             self.draw_character8x8(dx, y, char)

@@ -1,6 +1,8 @@
 # Glacier Communicator Firmware
 # EC25 Cellular Driver
 # By Johnny Stene
+#
+# TODO: everything in here is evil hacks and i hate it. write proper parser for at responses
 
 import machine
 import time

@@ -17,12 +17,14 @@ class KEYPAD:
             self.pins.append(Pin(pins[pin + 4], mode=Pin.IN, pull = Pin.PULL_DOWN))
     
     def get_key(self, wait=False, debounce=False):
+        # TODO: should busy waiting happen here?
+        # TODO: i wish micropython had threads :(
         while True:
             for col in range(4):
                 self.pins[col].value(1)
                 for row in range(4):
                     if self.pins[row + 4].value():
-                        # todo: debounce
+                        # TODO: debounce
                         return self.translation[col][row]
                 self.pins[col].value(0)
                 time.sleep(0.05)
