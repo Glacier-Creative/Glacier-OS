@@ -1,5 +1,5 @@
-# communicator-firmware
-Glacier Communicator Firmware
+# Glacier-OS
+Open-source, highly portable mobile OS
 
 ## About the Glacier Communicator
 The Glacier Communicator (better name pending) is my second attempt at building an open-source mobile phone. It features a 2.7" E-Paper display, a 4G modem, 12-button keypad with 4 
