@@ -68,6 +68,10 @@ class GRAPHICS:
     def draw_string24h(self, x, y, string): # TODO: add font scaling
         dx = x
         for character in string:
+            if(character == " "):
+                dx += 8
+                continue
+            
             width = self.font24[ord(character) - ord("!")][0]
             data = self.font24[ord(character) - ord("!")][1]
             for iy in range(24):

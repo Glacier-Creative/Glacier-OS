@@ -30,8 +30,9 @@ print("Graphics bringup")
 graphics = GRAPHICS()
 
 def home_redraw():
-    graphics.draw_image(0, 0, "img/homescreen.xbm")
-    graphics.draw_string24h(7, 51, "Test!")
+    graphics.clear()
+    graphics.draw_string24h(4, 4, "Glacier OS")
+    graphics.draw_string24h(4, 28, "Alpha Ver.")
     graphics.refresh()
 
 def handle_call():
