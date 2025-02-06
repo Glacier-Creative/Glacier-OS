@@ -31,7 +31,7 @@ graphics = GRAPHICS()
 
 def home_redraw():
     graphics.draw_image(0, 0, "img/homescreen.xbm")
-    graphics.draw_string8x8(16, 24, "Test!")
+    graphics.draw_string24h(7, 51, "Test!")
     graphics.refresh()
 
 def handle_call():
@@ -42,8 +42,8 @@ def handle_call():
     print("incoming call")
     graphics.clear()
     graphics.draw_image(0, 0, "img/ring.xbm")
-    graphics.draw_string8x8(0, 32, "A: Answer")
-    graphics.draw_string8x8(0, 40, "B: End")
+    #graphics.draw_string8x8(0, 32, "A: Answer")
+    #graphics.draw_string8x8(0, 40, "B: End")
     graphics.refresh()
 
     while True:
@@ -63,7 +63,7 @@ def handle_call():
 
     graphics.clear()
     graphics.draw_image(0, 0, "img/in_call.xbm")
-    graphics.draw_string8x8(0, 40, "B: End")
+    #graphics.draw_string8x8(0, 40, "B: End")
     graphics.refresh()
     cell.answer_call()
 
@@ -89,11 +89,11 @@ def handle_sms(**kwargs): # has to be called with data=<msgdata>
     message = kwargs["data"]
     graphics.clear()
     graphics.draw_image(0, 0, "img/sms.xbm")
-    graphics.draw_string8x8(8, 32, db.get_name(message.number))
-    graphics.draw_string8x8(8, 40, message.date)
-    graphics.draw_string8x8(8, 48, message.time)
-    graphics.draw_string8x8(8, 64, message.message)
-    graphics.refresh()
+    #graphics.draw_string8x8(8, 32, db.get_name(message.number))
+    #graphics.draw_string8x8(8, 40, message.date)
+    #graphics.draw_string8x8(8, 48, message.time)
+    #graphics.draw_string8x8(8, 64, message.message)
+    #graphics.refresh()
     time.sleep(10)
 
     event.publish("home_redraw")

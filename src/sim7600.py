@@ -23,6 +23,7 @@ class CELLULAR:
         self.uart.write("ATE0\r")
         time.sleep(0.1)
         self.uart.read()
+        self.modem_alive = True
 
     def send_command(self, command, response_timeout=0.5):
         #print("cell >> " + command)
@@ -32,10 +33,15 @@ class CELLULAR:
             response = self.uart.read().decode("ascii").split("\r\n")[1:-1]
         except:
             print("No response from modem!!!!")
+            self.modem_alive = False
+            return [""]
         #print("cell << " + str(response))
         return response
     
     def startup(self):
+        if not self.modem_alive:
+            return None
+        
         self.manufacturer = self.send_command("AT+CGMI")[0]
         self.model = self.send_command("AT+CGMM")[0]
         self.imei = self.send_command("AT+CGSN")[0]
@@ -43,6 +49,8 @@ class CELLULAR:
         self.send_command("AT+CTZU=1")
 
     def get_rtc(self):
+        if not self.modem_alive:
+            return None
         response = self.send_command("AT+CCLK?")
         for line in response:
             if "+CCLK" in line:
@@ -51,28 +59,42 @@ class CELLULAR:
 
     # NETWORK FUNCTIONS
     def provider_name(self):
+        if not self.modem_alive:
+            return None
         response = self.send_command("AT+CSPN?")[0]
         if response == "ERROR":
             return None
         return response[7:-2]
 
     def imsi(self):
+        if not self.modem_alive:
+            return None
         return self.send_command("AT+CIMI")[0]
 
     def phone_number(self):
+        if not self.modem_alive:
+            return None
         return self.send_command("AT+CNUM")[0].split("\"")[3]
     
     # CALL FUNCTIONS
     def call(self, number):
+        if not self.modem_alive:
+            return None
         return self.send_command("ATD" + number + ";")
     
     def end_call(self):
+        if not self.modem_alive:
+            return None
         return self.send_command("AT+CHUP")
 
     def answer_call(self):
+        if not self.modem_alive:
+            return None
         return self.send_command("ATA")
     
     def phone_status(self):
+        if not self.modem_alive:
+            return ""
         # 0: ready
         # 3: ringing
         # 4: in call
@@ -80,11 +102,15 @@ class CELLULAR:
 
     # SMS FUNCTIONS
     def send_sms(self, number, message):
+        if not self.modem_alive:
+            return None
         response = self.send_command("AT+CMGS=\"" + number + "\"\r")
         response = self.send_command(message + "\x1A", response_timeout=10)
         return response
 
     def read_all_sms(self):
+        if not self.modem_alive:
+            return []
         response = self.send_command("AT+CMGL=\"ALL\"", response_timeout=1)
         messages = []
         for i in range(int(len(response) / 2)):
