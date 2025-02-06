@@ -32,7 +32,11 @@ graphics = GRAPHICS()
 def home_redraw():
     graphics.clear()
     graphics.draw_string24h(4, 4, "Glacier OS")
-    graphics.draw_string24h(4, 28, "Alpha Ver.")
+    graphics.draw_string16h(4, 28, "Alpha Build 0.1")
+    if(cell.modem_alive):
+        graphics.draw_string16h(4, 48, "Call/SMS Wait")
+    else:
+        graphics.draw_string16h(4, 48, "No modem!")
     graphics.refresh()
 
 def handle_call():

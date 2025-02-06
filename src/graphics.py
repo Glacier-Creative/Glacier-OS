@@ -3,6 +3,7 @@ import json
 
 class GRAPHICS:
     font24 = [] # TODO: more efficient way to store fonts - this one is like 80kb of ram and we have like 380kb total
+    font16 = []
 
     def __init__(self):
         self.display = DISPLAY()
@@ -15,6 +16,12 @@ class GRAPHICS:
                 self.font24 = json.load(fontfile)
         except:
             print("Error loading 24h.json")
+
+        try:
+            with open("fonts/16h.json") as fontfile:
+                self.font16 = json.load(fontfile)
+        except:
+            print("Error loading 16h.json")
 
     def refresh(self): # send framebuffer to display
         self.display.display(self.framebuffer)
@@ -75,6 +82,20 @@ class GRAPHICS:
             width = self.font24[ord(character) - ord("!")][0]
             data = self.font24[ord(character) - ord("!")][1]
             for iy in range(24):
+                for ix in range(width):
+                    self.set_pixel(dx + ix, y + iy, data[width * iy + ix])
+            dx += width
+    
+    def draw_string16h(self, x, y, string): # TODO: add font scaling
+        dx = x
+        for character in string:
+            if(character == " "):
+                dx += 6
+                continue
+            
+            width = self.font16[ord(character) - ord("!")][0]
+            data = self.font16[ord(character) - ord("!")][1]
+            for iy in range(16):
                 for ix in range(width):
                     self.set_pixel(dx + ix, y + iy, data[width * iy + ix])
             dx += width
